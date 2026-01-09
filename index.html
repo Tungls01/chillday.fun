@@ -7,6 +7,7 @@
   <meta name="description" content="chillday.fun – No work today. Just chill & have fun." />
 
   <style>
+    /* Reset & font */
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Comic Sans MS","Trebuchet MS",system-ui,sans-serif; }
 
     body {
@@ -15,18 +16,21 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      padding: 2rem;
     }
 
+    /* Poster container */
     .poster {
       background: #fff8e1;
       max-width: 720px;
-      width: 92%;
+      width: 100%;
       border-radius: 32px;
       border: 6px solid #111827;
       box-shadow: 0 25px 0 #f59e0b, 0 50px 80px rgba(0,0,0,0.35);
       overflow: hidden;
     }
 
+    /* Header */
     .header {
       background: linear-gradient(180deg, #38bdf8, #0ea5e9);
       padding: 1.5rem 1rem 1rem;
@@ -37,6 +41,7 @@
     .header h1 { font-size: 3.5rem; color: #fef3c7; text-shadow: 4px 4px 0 #111827; letter-spacing: 2px; }
     .header p { margin-top: 0.5rem; font-size: 1.1rem; font-weight: 800; color: #fff; }
 
+    /* Content */
     .content { padding: 2rem 1.5rem; text-align: center; }
 
     .speech {
@@ -49,6 +54,7 @@
       margin-bottom: 1.75rem;
     }
 
+    /* Characters grid */
     .characters {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
@@ -66,7 +72,10 @@
       box-shadow: 0 6px 0 #92400e;
       cursor: pointer;
       text-align: center;
+      transition: transform 0.15s ease;
     }
+
+    .char:hover { transform: translateY(4px); box-shadow: 0 4px 0 rgba(0,0,0,0.4); }
 
     .char img {
       max-width: 80%;
@@ -75,11 +84,13 @@
       margin: 0 auto 5px auto;
     }
 
+    /* Buttons */
     .buttons {
       display: flex;
       gap: 1rem;
       justify-content: center;
       flex-wrap: wrap;
+      margin-bottom: 1rem;
     }
 
     .btn {
@@ -104,7 +115,7 @@
       color: #78350f;
     }
 
-    /* Popup fullscreen */
+    /* Popup fullscreen with info */
     #popup {
       display: none;
       position: fixed;
@@ -116,12 +127,52 @@
       z-index: 1000;
     }
 
-    #popup img {
-      max-width: 80%;
-      max-height: 80%;
-      border: 6px solid #fff;
-      border-radius: 12px;
+    .popup-content {
+      background: #fff8e1;
+      border: 6px solid #111827;
+      border-radius: 24px;
+      padding: 2rem;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      position: relative;
     }
+
+    .popup-content img {
+      max-width: 60%;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .popup-content h2 {
+      margin-bottom: 0.5rem;
+      font-size: 1.8rem;
+      color: #111827;
+    }
+
+    .popup-content p {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 1.2rem;
+    }
+
+    .popup-content button {
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      font-weight: 700;
+      border: 4px solid #111827;
+      background: #22c55e;
+      color: #111827;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .popup-content button:hover {
+      transform: translateY(3px);
+      box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+    }
+
   </style>
 </head>
 <body>
@@ -140,29 +191,29 @@
     </div>
 
     <div class="characters">
-      <div class="char" onclick="showImage('images/sloth.png')">
+      <div class="char" onclick="showCharacter('sloth')">
         <img src="images/sloth.png" alt="Chill Sloth">
         Chill Sloth
       </div>
-      <div class="char" onclick="showImage('images/doge.png')">
+      <div class="char" onclick="showCharacter('doge')">
         <img src="images/doge.png" alt="Sunglasses Doge">
         Sunglasses Doge
       </div>
-      <div class="char" onclick="showImage('images/icecream.png')">
+      <div class="char" onclick="showCharacter('icecream')">
         <img src="images/icecream.png" alt="Ice Cream Bro">
         Ice Cream Bro
       </div>
-      <div class="char" onclick="showImage('images/pineapple.png')">
+      <div class="char" onclick="showCharacter('pineapple')">
         <img src="images/pineapple.png" alt="Cool Pineapple">
-       
+        Cool Pineapple
       </div>
-      <div class="char" onclick="showImage('images/sun.png')">
+      <div class="char" onclick="showCharacter('sun')">
         <img src="images/sun.png" alt="Lazy Sun">
-       
+        Lazy Sun
       </div>
-      <div class="char" onclick="showImage('images/bird.png')">
+      <div class="char" onclick="showCharacter('bird')">
         <img src="images/bird.png" alt="Beer Bird">
-      
+        Beer Bird
       </div>
     </div>
 
@@ -179,21 +230,66 @@
 
 <!-- Popup container -->
 <div id="popup" onclick="closePopup()">
-  <img id="popup-img" src="" alt="Character">
+  <div class="popup-content" onclick="event.stopPropagation()">
+    <img id="popup-img" src="" alt="Character">
+    <h2 id="popup-name"></h2>
+    <p id="popup-info"></p>
+    <button onclick="closePopup()">Close</button>
+  </div>
 </div>
 
-<!-- Nhạc nền tùy chọn -->
+<!-- Background music -->
 <audio src="music/chill.mp3" autoplay loop style="display:none"></audio>
 
 <script>
-function showImage(src) {
-  document.getElementById('popup-img').src = src;
-  document.getElementById('popup').style.display = 'flex';
-}
+  // Character data
+  const characters = {
+    sloth: {
+      img: 'images/sloth.png',
+      name: 'Chill Sloth',
+      info: 'This sloth moves slow, but relaxes fast. Perfect chill buddy.'
+    },
+    doge: {
+      img: 'images/doge.png',
+      name: 'Sunglasses Doge',
+      info: 'Doge loves vibes, memes, and chilling in the sun.'
+    },
+    icecream: {
+      img: 'images/icecream.png',
+      name: 'Ice Cream Bro',
+      info: 'Sweet, cold, and always ready for a good time.'
+    },
+    pineapple: {
+      img: 'images/pineapple.png',
+      name: 'Cool Pineapple',
+      info: 'Tropical, refreshing, and totally chill.'
+    },
+    sun: {
+      img: 'images/sun.png',
+      name: 'Lazy Sun',
+      info: 'Shines bright but takes it easy. No rush.'
+    },
+    bird: {
+      img: 'images/bird.png',
+      name: 'Beer Bird',
+      info: 'Flies high, loves a drink, and enjoys life.'
+    }
+  };
 
-function closePopup() {
-  document.getElementById('popup').style.display = 'none';
-}
+  // Show popup
+  function showCharacter(key) {
+    const char = characters[key];
+    if (!char) return;
+    document.getElementById('popup-img').src = char.img;
+    document.getElementById('popup-name').textContent = char.name;
+    document.getElementById('popup-info').textContent = char.info;
+    document.getElementById('popup').style.display = 'flex';
+  }
+
+  // Close popup
+  function closePopup() {
+    document.getElementById('popup').style.display = 'none';
+  }
 </script>
 
 </body>
